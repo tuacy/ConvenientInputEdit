@@ -18,12 +18,12 @@ import android.widget.PopupWindow;
 
 public class ConvenientInputEditText extends AppCompatEditText {
 
+	private Context                    mContext;
 	private ConvenientInputPopupWindow mConvenientInputPopupWindow;
-	private View                       mDecorView;
-	private View                       mContentView;
 	private int                        mScrollDistance;
 	private Rect                       mRect;
 	private EditText                   mEditText;
+	private int                        mSoftKeyboardHeight;
 
 	public ConvenientInputEditText(Context context) {
 		super(context);
@@ -41,10 +41,13 @@ public class ConvenientInputEditText extends AppCompatEditText {
 	}
 
 	private void init(Context context) {
+		mContext = context;
+		mSoftKeyboardHeight = 0;
 		mEditText = this;
 		mConvenientInputPopupWindow = new ConvenientInputPopupWindow(context, new ConvenientInputPopupWindow.KeyboardAction() {
 			@Override
 			public void onKeyboardRequest() {
+				hideConvenientPopup();
 				KeyBoardUtils.openKeyBoard(mEditText, getContext());
 			}
 		});
@@ -53,8 +56,9 @@ public class ConvenientInputEditText extends AppCompatEditText {
 			@Override
 			public void onDismiss() {
 				if (mScrollDistance > 0) {
-					if (null != mContentView) {
-						mContentView.scrollBy(0, -mScrollDistance);
+					View contentView = ((Activity) mContext).getWindow().findViewById(Window.ID_ANDROID_CONTENT);
+					if (null != contentView) {
+						contentView.scrollBy(0, -mScrollDistance);
 					}
 					mScrollDistance = 0;
 				}
@@ -62,38 +66,43 @@ public class ConvenientInputEditText extends AppCompatEditText {
 		});
 	}
 
-	private void showConvenientPopup() {
-		if (null != mConvenientInputPopupWindow) {
-			if (!mConvenientInputPopupWindow.isShowing()) {
-				mConvenientInputPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-				mConvenientInputPopupWindow.showAtLocation(mDecorView, Gravity.BOTTOM, 0, 0);
-				mConvenientInputPopupWindow.update();
-				if (null != mDecorView && null != mContentView) {
-					int[] pos = new int[2];
-					// 获取当前EditText在屏幕中的坐标
-					getLocationOnScreen(pos);
-					float height = dpToPx(getContext(), 240);
-					// * 包括标题栏，但不包括状态栏。
-					if (mRect == null) {
-						mRect = new Rect();
-					}
-					mDecorView.getWindowVisibleDisplayFrame(mRect);// 获得view空间，也就是除掉标题栏
-					// outRect.top表示状态栏（通知栏)
-					DisplayMetrics metrics = new DisplayMetrics();
-					WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-					if (windowManager != null) {
-						Display display = windowManager.getDefaultDisplay();
-						display.getMetrics(metrics);
-						int screen = metrics.heightPixels - getStatusBarHeight();
-						//计算偏移的距离
-						mScrollDistance = (int) ((pos[1] + getMeasuredHeight() - mRect.top) - (screen - height));
-						if (mScrollDistance > 0) {
-							mContentView.scrollBy(0, mScrollDistance);
-						}
+	private boolean showConvenientPopup() {
+		if (mConvenientInputPopupWindow == null || mSoftKeyboardHeight == 0) {
+			return false;
+		}
+		View decorView = ((Activity) mContext).getWindow().getDecorView();
+		View contentView = ((Activity) mContext).getWindow().findViewById(Window.ID_ANDROID_CONTENT);
+		if (!mConvenientInputPopupWindow.isShowing()) {
+			mConvenientInputPopupWindow.setHeight(mSoftKeyboardHeight);
+			mConvenientInputPopupWindow.showAtLocation(decorView, Gravity.BOTTOM, 0, 0);
+			mConvenientInputPopupWindow.update();
+			if (null != decorView && null != contentView) {
+				int[] pos = new int[2];
+				// 获取当前EditText在屏幕中的坐标
+				getLocationOnScreen(pos);
+				// * 包括标题栏，但不包括状态栏。
+				if (mRect == null) {
+					mRect = new Rect();
+				}
+				decorView.getWindowVisibleDisplayFrame(mRect);// 获得view空间，也就是除掉标题栏
+				// outRect.top表示状态栏（通知栏)
+				DisplayMetrics metrics = new DisplayMetrics();
+				WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+				if (windowManager != null) {
+					Display display = windowManager.getDefaultDisplay();
+					display.getMetrics(metrics);
+					int screen = metrics.heightPixels - getStatusBarHeight();
+					//计算偏移的距离
+					mScrollDistance = (pos[1] + getMeasuredHeight() - mRect.top) - (screen - mSoftKeyboardHeight);
+					if (mScrollDistance > 0) {
+						contentView.scrollBy(0, mScrollDistance);
 					}
 				}
+			} else {
+				return false;
 			}
 		}
+		return true;
 	}
 
 	private void hideConvenientPopup() {
@@ -118,8 +127,16 @@ public class ConvenientInputEditText extends AppCompatEditText {
 		requestFocus();
 		requestFocusFromTouch();
 		if (event.getAction() == MotionEvent.ACTION_UP) {
-			KeyBoardUtils.closeKeyBoard(this, this.getContext());
-			showConvenientPopup();
+			KeyBoardUtils.closeKeyBoard(mEditText, mContext);
+			mEditText.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					if (!showConvenientPopup()) {
+						KeyBoardUtils.openKeyBoard(mEditText, mContext);
+					}
+				}
+			}, 300);
+
 		}
 		return true;
 	}
@@ -141,8 +158,6 @@ public class ConvenientInputEditText extends AppCompatEditText {
 	@Override
 	public void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		mDecorView = ((Activity) getContext()).getWindow().getDecorView();
-		mContentView = ((Activity) getContext()).getWindow().findViewById(Window.ID_ANDROID_CONTENT);
 		KeyBoardUtils.closeKeyBoard(this, this.getContext());
 	}
 
@@ -150,6 +165,10 @@ public class ConvenientInputEditText extends AppCompatEditText {
 	public void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
 		hideConvenientPopup();
+	}
+
+	public void setSoftKeyboardHeight(int height) {
+		mSoftKeyboardHeight = height;
 	}
 
 	/**

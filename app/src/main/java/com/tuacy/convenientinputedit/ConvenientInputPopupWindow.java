@@ -34,7 +34,7 @@ public class ConvenientInputPopupWindow extends PopupWindow {
 			}
 		});
 		setWidth(WindowManager.LayoutParams.MATCH_PARENT);
-		setHeight(dpToPx(context, 240));
+		setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
 		setAnimationStyle(R.style.AnimationFade);
 		ColorDrawable dw = new ColorDrawable(00000);
 		setBackgroundDrawable(dw);

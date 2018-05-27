@@ -20,7 +20,7 @@ public class ConvenientActivity extends AppCompatActivity {
 	}
 
 	private ConvenientInputEditText mEditText;
-	private Handler mHandler;
+	private Handler                 mHandler;
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class ConvenientActivity extends AppCompatActivity {
 				mHandler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						Log.d("tuacy", "height = " + getSupportSoftInputHeight());
+						mEditText.setSoftKeyboardHeight(getSupportSoftInputHeight());
 						KeyBoardUtils.closeKeyBoard(mEditText, mEditText.getContext());
 					}
 				}, 300);
