@@ -4,16 +4,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/button_1"
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Activity 1" />
+        android:inputType="text"/>
 
-    <Button
-        android:id="@+id/button_2"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="400dp"/>
+
+    <com.tuacy.convenientinputedit.quickinput.QuickInputEditText
+        android:id="@+id/edit_shortcut_input1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Activity 2" />
+        android:inputType="text"/>
 
+    <com.tuacy.convenientinputedit.quickinput.QuickInputEditText
+        android:id="@+id/edit_shortcut_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"/>
 </LinearLayout>
