@@ -1,26 +1,21 @@
 package com.tuacy.convenientinputedit;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
+import com.tuacy.convenientinputedit.base.MobileBaseActivity;
 import com.tuacy.convenientinputedit.quickinput.QuickInputEditText;
 import com.tuacy.convenientinputedit.utls.KeyBoardUtils;
+import com.tuacy.convenientinputedit.utls.PreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends MobileBaseActivity {
 
-	private Activity           mActivity;
-	private Context            mContext;
-	private Handler            mHandler;
-	private QuickInputEditText mEditText;
-	private QuickInputEditText mEditText1;
+	private QuickInputEditText mEditEvaluate;
+	private QuickInputEditText mEditTextFeel;
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,10 +29,12 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void initView() {
-		mEditText1 = findViewById(R.id.edit_shortcut_input1);
-		mEditText1.attachActivity(this);
-		mEditText = findViewById(R.id.edit_shortcut_input);
-		mEditText.attachActivity(this);
+		mEditEvaluate = findViewById(R.id.edit_shortcut_evaluate);
+		mEditEvaluate.attachActivity(this);
+		mEditEvaluate.setShortcutList(obtainShortcutEvaluate());
+		mEditTextFeel = findViewById(R.id.edit_shortcut_feel);
+		mEditTextFeel.attachActivity(this);
+		mEditTextFeel.setShortcutList(obtainShortcutFeel());
 	}
 
 	private void initEvent() {
@@ -45,36 +42,64 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void initData() {
-		mHandler = new Handler(Looper.getMainLooper());
-		mHandler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				KeyBoardUtils.openKeyBoard(mEditText, mEditText.getContext());
-				mHandler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						mEditText.setPopupHeight(dpToPx(mContext, 32), KeyBoardUtils.getKeyBoardHeight(mActivity));
-						mEditText.setShortcutList(obtainShortcutList());
-						mEditText1.setPopupHeight(dpToPx(mContext, 32), KeyBoardUtils.getKeyBoardHeight(mActivity));
-						mEditText1.setShortcutList(obtainShortcutList());
-						KeyBoardUtils.closeKeyBoard(mEditText, mEditText.getContext());
-					}
-				}, 300);
-			}
-		}, 300);
+		initQuickInputEditText();
 
 	}
 
-	private List<String> obtainShortcutList() {
+	/**
+	 * 这里先去获取下键盘的高度，存储到SharedPreferences文件里面去（这里没有考虑键盘高度变化的情况）
+	 */
+	private void initQuickInputEditText() {
+		int preferencesKeyboardHeight = PreferencesUtils.getInt(mContext, Contexts.PREFERENCE_KEYBOARD_HEIGHT, 0);
+		if (preferencesKeyboardHeight == 0) {
+			//人为的弹出键盘，计算键盘高度，隐藏键盘
+			getMainHandler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					KeyBoardUtils.openKeyBoard(mEditTextFeel, mEditTextFeel.getContext());
+					getMainHandler().postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							int keyboardHeight = KeyBoardUtils.getKeyBoardHeight(mActivity);
+							PreferencesUtils.putInt(mContext, Contexts.PREFERENCE_KEYBOARD_HEIGHT, keyboardHeight);
+							initQuickInputPopHeight(keyboardHeight);
+							KeyBoardUtils.closeKeyBoard(mEditTextFeel, mEditTextFeel.getContext());
+						}
+					}, 200);
+				}
+			}, 200);
+		} else {
+			initQuickInputPopHeight(preferencesKeyboardHeight);
+		}
+	}
+
+	private void initQuickInputPopHeight(int keyboardHeight) {
+		mEditTextFeel.setPopupHeight(dpToPx(mContext, 32), keyboardHeight);
+		mEditEvaluate.setPopupHeight(dpToPx(mContext, 32), keyboardHeight);
+	}
+
+	private List<String> obtainShortcutEvaluate() {
 		List<String> list = new ArrayList<>();
-		list.add("快捷输入0");
-		list.add("快捷输入1");
-		list.add("快捷输入2");
-		list.add("快捷输入3");
-		list.add("快捷输入4");
-		list.add("快捷输入5");
-		list.add("快捷输入6");
-		list.add("快捷输入7");
+		list.add("哎呀，这个产品真好！");
+		list.add("一般搬！");
+		list.add("勉强能接受！");
+		list.add("有点糟糕！");
+		list.add("这产品不行呀！");
+		list.add("这都是生产的啥！");
+		list.add("后悔买这个产品了！");
+		list.add("这产品一点用处都没得！");
+		return list;
+	}
+
+	private List<String> obtainShortcutFeel() {
+		List<String> list = new ArrayList<>();
+		list.add("第一感觉非常好！");
+		list.add("不错，不错！");
+		list.add("阳光！");
+		list.add("不好！");
+		list.add("有点糟糕！");
+		list.add("糟糕！");
+		list.add("非常的糟糕！");
 		return list;
 	}
 

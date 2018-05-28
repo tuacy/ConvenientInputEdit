@@ -57,7 +57,7 @@ public class QuickInputEditText extends AppCompatEditText {
 			@Override
 			public void onDismiss() {
 				if (mScrollDistance > 0) {
-					checAttach();
+					checkAttachActivity();
 					View contentView = mActivity.getWindow().findViewById(Window.ID_ANDROID_CONTENT);
 					if (null != contentView) {
 						contentView.scrollBy(0, -mScrollDistance);
@@ -149,9 +149,19 @@ public class QuickInputEditText extends AppCompatEditText {
 
 	}
 
+	@Override
+	protected void onDetachedFromWindow() {
+		checkAttachActivity();
+		View decorView = mActivity.getWindow().getDecorView();
+		decorView.getViewTreeObserver().removeOnGlobalLayoutListener(mOnGlobalLayoutListener);
+		super.onDetachedFromWindow();
+	}
+
 	public void attachActivity(Activity activity) {
 		mActivity = activity;
-		addOnSoftKeyBoardVisibleListener(mActivity);
+		View decorView = activity.getWindow().getDecorView();
+		decorView.getViewTreeObserver().addOnGlobalLayoutListener(mOnGlobalLayoutListener);
+
 	}
 
 	public void setPopupHeight(int actionBarHeight, int keyboardHeight) {
@@ -164,7 +174,7 @@ public class QuickInputEditText extends AppCompatEditText {
 	}
 
 	private void showPopup() {
-		checAttach();
+		checkAttachActivity();
 		KeyBoardUtils.closeKeyBoard(mEditText, mContext);
 		View decorView = mActivity.getWindow().getDecorView();
 		View contentView = mActivity.getWindow().findViewById(Window.ID_ANDROID_CONTENT);
@@ -259,35 +269,34 @@ public class QuickInputEditText extends AppCompatEditText {
 		return statusBarHeight1;
 	}
 
-	private void checAttach() {
+	private void checkAttachActivity() {
 		if (mActivity == null) {
 			throw new NullPointerException("no set activity please call the attachActivity() function first");
 		}
 	}
 
-	public void addOnSoftKeyBoardVisibleListener(Activity activity) {
-		final View decorView = activity.getWindow().getDecorView();
-		decorView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				Rect rect = new Rect();
-				decorView.getWindowVisibleDisplayFrame(rect);
-				//计算出可见屏幕的高度
-				int displayHeight = rect.bottom - rect.top;
-				//获得屏幕整体的高度
-				int height = decorView.getHeight();
-				//获得键盘高度
-				boolean visible = (double) displayHeight / height < 0.8;
-				//如果键盘消失
-				if (!visible && !mQuickInputSelectPopup.isShowing()) {
-					if (mQuickInputBarPopup.isShowing()) {
-						mQuickInputBarPopup.dismiss();
-					}
-					if (mQuickInputSelectPopup.isShowing()) {
-						mQuickInputSelectPopup.dismiss();
-					}
+	private ViewTreeObserver.OnGlobalLayoutListener mOnGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+		@Override
+		public void onGlobalLayout() {
+			checkAttachActivity();
+			View decorView = mActivity.getWindow().getDecorView();
+			Rect rect = new Rect();
+			decorView.getWindowVisibleDisplayFrame(rect);
+			//计算出可见屏幕的高度
+			int displayHeight = rect.bottom - rect.top;
+			//获得屏幕整体的高度
+			int height = decorView.getHeight();
+			//获得键盘高度
+			boolean visible = (double) displayHeight / height < 0.8;
+			//如果键盘消失
+			if (!visible && !mQuickInputSelectPopup.isShowing()) {
+				if (mQuickInputBarPopup.isShowing()) {
+					mQuickInputBarPopup.dismiss();
+				}
+				if (mQuickInputSelectPopup.isShowing()) {
+					mQuickInputSelectPopup.dismiss();
 				}
 			}
-		});
-	}
+		}
+	};
 }

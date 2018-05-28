@@ -4,24 +4,49 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="400dp"/>
-
-    <com.tuacy.convenientinputedit.quickinput.QuickInputEditText
-        android:id="@+id/edit_shortcut_input1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text"/>
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/evaluate"
+        android:textSize="18sp" />
 
     <com.tuacy.convenientinputedit.quickinput.QuickInputEditText
-        android:id="@+id/edit_shortcut_input"
+        android:id="@+id/edit_shortcut_evaluate"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/shape_input"
+        android:gravity="top"
+        android:hint="@string/hint_evaluate"
+        android:inputType="textMultiLine"
+        android:padding="8dp"
+        android:singleLine="false" />
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"/>
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/feel"
+        android:textSize="18sp" />
+
+    <com.tuacy.convenientinputedit.quickinput.QuickInputEditText
+        android:id="@+id/edit_shortcut_feel"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/shape_input"
+        android:gravity="top"
+        android:hint="@string/hint_feel"
+        android:inputType="textMultiLine"
+        android:padding="8dp"
+        android:singleLine="false" />
 </LinearLayout>

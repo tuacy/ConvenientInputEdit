@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ConvenientInputEdit</string>
     <string name="cancel">取消</string>
+    <string name="evaluate">评价：</string>
+    <string name="hint_evaluate">请输入评价内容</string>
+    <string name="feel">感受</string>
+    <string name="hint_feel">请输您的感受</string>
 </resources>
