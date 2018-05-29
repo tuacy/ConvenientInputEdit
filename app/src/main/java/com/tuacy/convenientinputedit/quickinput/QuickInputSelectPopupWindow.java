@@ -13,6 +13,9 @@ import com.tuacy.convenientinputedit.R;
 
 import java.util.List;
 
+/**
+ * 选择快捷输入短语
+ */
 class QuickInputSelectPopupWindow extends PopupWindow {
 
 	public interface OnItemSelectListener {

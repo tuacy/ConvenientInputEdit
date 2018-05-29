@@ -3,9 +3,7 @@ package com.tuacy.convenientinputedit.utls;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
-import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -66,7 +64,7 @@ public class KeyBoardUtils {
 		softInputHeight = softInputHeight - getSoftButtonsBarHeight(activity);
 		//		}
 
-		return softInputHeight;
+		return softInputHeight < 0 ? 0 : softInputHeight;
 	}
 
 	public static int getSoftButtonsBarHeight(Activity activity) {

@@ -9,6 +9,9 @@ import android.widget.PopupWindow;
 
 import com.tuacy.convenientinputedit.R;
 
+/**
+ * 快速输入切换bar，可以在快捷输入和键盘之间来回切换
+ */
 class QuickInputBarPopupWindow extends PopupWindow {
 
 	public interface ActionBarAction {

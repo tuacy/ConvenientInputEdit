@@ -3,6 +3,7 @@ package com.tuacy.convenientinputedit;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tuacy.convenientinputedit.base.MobileBaseActivity;
 import com.tuacy.convenientinputedit.quickinput.QuickInputEditText;
@@ -50,8 +51,8 @@ public class MainActivity extends MobileBaseActivity {
 	 * 这里先去获取下键盘的高度，存储到SharedPreferences文件里面去（这里没有考虑键盘高度变化的情况）
 	 */
 	private void initQuickInputEditText() {
-		int preferencesKeyboardHeight = PreferencesUtils.getInt(mContext, Contexts.PREFERENCE_KEYBOARD_HEIGHT, 0);
-		if (preferencesKeyboardHeight == 0) {
+		int preferencesKeyboardHeight = PreferencesUtils.getInt(mContext, Contexts.PREFERENCE_KEYBOARD_HEIGHT, -1);
+		if (preferencesKeyboardHeight == -1) {
 			//人为的弹出键盘，计算键盘高度，隐藏键盘
 			getMainHandler().postDelayed(new Runnable() {
 				@Override
@@ -74,6 +75,9 @@ public class MainActivity extends MobileBaseActivity {
 	}
 
 	private void initQuickInputPopHeight(int keyboardHeight) {
+		if (keyboardHeight <= 0) {
+			keyboardHeight = dpToPx(mContext, 250);
+		}
 		mEditTextFeel.setPopupHeight(dpToPx(mContext, 32), keyboardHeight);
 		mEditEvaluate.setPopupHeight(dpToPx(mContext, 32), keyboardHeight);
 	}
