@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape>
-            <solid android:color="#f1f1f1" />
+            <solid android:color="#DEDEDE" />
         </shape>
     </item>
     <!-- 背景图片，android:right表示阴影图片右边到背景图片右边的距离
